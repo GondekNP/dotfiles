@@ -1,0 +1,157 @@
+[
+    // File navigation
+    {
+        "key": "ctrl+p",
+        "command": "workbench.action.quickOpen"
+    },
+    {
+        "key": "ctrl+shift+p",
+        "command": "workbench.action.showCommands"
+    },
+    {
+        "key": "ctrl+shift+e",
+        "command": "workbench.view.explorer"
+    },
+    
+    // Terminal
+    {
+        "key": "ctrl+`",
+        "command": "workbench.action.terminal.toggleTerminal"
+    },
+    {
+        "key": "ctrl+shift+`",
+        "command": "workbench.action.terminal.new"
+    },
+    
+    // Editor management
+    {
+        "key": "ctrl+w",
+        "command": "workbench.action.closeActiveEditor"
+    },
+    {
+        "key": "ctrl+shift+t",
+        "command": "workbench.action.reopenClosedEditor"
+    },
+    {
+        "key": "ctrl+tab",
+        "command": "workbench.action.nextEditor"
+    },
+    {
+        "key": "ctrl+shift+tab",
+        "command": "workbench.action.previousEditor"
+    },
+    
+    // Code formatting
+    {
+        "key": "shift+alt+f",
+        "command": "editor.action.formatDocument"
+    },
+    {
+        "key": "ctrl+k ctrl+f",
+        "command": "editor.action.formatSelection"
+    },
+    
+    // Code navigation
+    {
+        "key": "f12",
+        "command": "editor.action.revealDefinition"
+    },
+    {
+        "key": "alt+f12",
+        "command": "editor.action.peekDefinition"
+    },
+    {
+        "key": "shift+f12",
+        "command": "editor.action.goToReferences"
+    },
+    
+    // GitHub Copilot
+    {
+        "key": "ctrl+i",
+        "command": "github.copilot.generate"
+    },
+    {
+        "key": "alt+\\",
+        "command": "github.copilot.acceptCursorPanelSuggestion"
+    },
+    {
+        "key": "alt+]",
+        "command": "github.copilot.nextPanelSuggestion"
+    },
+    {
+        "key": "alt+[",
+        "command": "github.copilot.previousPanelSuggestion"
+    },
+    
+    // Multi-cursor
+    {
+        "key": "ctrl+d",
+        "command": "editor.action.addSelectionToNextFindMatch"
+    },
+    {
+        "key": "ctrl+shift+l",
+        "command": "editor.action.selectHighlights"
+    },
+    {
+        "key": "alt+click",
+        "command": "editor.action.insertCursorAtEndOfEachLineSelected"
+    },
+    
+    // Line manipulation
+    {
+        "key": "alt+up",
+        "command": "editor.action.moveLinesUpAction"
+    },
+    {
+        "key": "alt+down",
+        "command": "editor.action.moveLinesDownAction"
+    },
+    {
+        "key": "shift+alt+up",
+        "command": "editor.action.copyLinesUpAction"
+    },
+    {
+        "key": "shift+alt+down",
+        "command": "editor.action.copyLinesDownAction"
+    },
+    {
+        "key": "ctrl+shift+k",
+        "command": "editor.action.deleteLines"
+    },
+    
+    // Search and replace
+    {
+        "key": "ctrl+f",
+        "command": "actions.find"
+    },
+    {
+        "key": "ctrl+h",
+        "command": "editor.action.startFindReplaceAction"
+    },
+    {
+        "key": "ctrl+shift+f",
+        "command": "workbench.view.search"
+    },
+    
+    // Comments
+    {
+        "key": "ctrl+/",
+        "command": "editor.action.commentLine"
+    },
+    {
+        "key": "shift+alt+a",
+        "command": "editor.action.blockComment"
+    },
+    
+    // Git
+    {
+        "key": "ctrl+shift+g",
+        "command": "workbench.view.scm"
+    },
+    
+    // Problems panel
+    {
+        "key": "ctrl+shift+m",
+        "command": "workbench.panel.markers.view.focus"
+    }
+]

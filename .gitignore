@@ -1,0 +1,82 @@
+# .gitignore for dotfiles repository
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+!config/vscode/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Node.js (for any test projects)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+
+# Personal files that shouldn't be shared
+personal/
+private/
+.env.local
+.env.production
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Test files (if any)
+test/
+tests/
+*.test.*
+
+# IDE files
+.idea/
+*.iml
+.project
+.classpath
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk

@@ -84,13 +84,8 @@ post_install_check() {
         CLAUDE_VERSION=$(claude --version 2>/dev/null | head -n1 || echo "unknown")
         log_success "Claude Code is available: ${CLAUDE_VERSION}"
         
-        # Run claude doctor
-        log_info "Running Claude Code diagnostics..."
-        if claude doctor; then
-            log_success "Claude Code diagnostics passed"
-        else
-            log_warning "Claude Code diagnostics found issues (this is normal for first install)"
-        fi
+        # Skip claude doctor to avoid interactive prompts
+        log_info "Skipping Claude Code diagnostics (can be run manually with 'claude doctor')"
         
         return 0
     else

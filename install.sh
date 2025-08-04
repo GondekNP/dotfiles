@@ -58,38 +58,79 @@ check_os() {
     fi
 }
 
+# Install Node.js if needed
+install_nodejs() {
+    log_info "Installing Node.js 18+ using NodeSource repository..."
+    
+    if [[ "$OS" == "ubuntu" ]]; then
+        # Install Node.js 18.x on Ubuntu/Debian
+        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+        sudo apt-get install -y nodejs
+    elif [[ "$OS" == "macos" ]]; then
+        # Install Node.js on macOS using Homebrew
+        if command -v brew &> /dev/null; then
+            brew install node@18
+            brew link node@18
+        else
+            log_error "Homebrew not found. Please install Node.js 18+ manually from https://nodejs.org/"
+            exit 1
+        fi
+    else
+        log_error "Automatic Node.js installation not supported on this OS."
+        log_info "Please install Node.js 18+ manually from https://nodejs.org/"
+        exit 1
+    fi
+}
+
 # Check prerequisites
 check_prerequisites() {
     log_info "Checking prerequisites..."
     
     # Check for Node.js
     if ! command -v node &> /dev/null; then
-        log_error "Node.js is required but not installed."
-        log_info "Please install Node.js 18+ from https://nodejs.org/"
-        exit 1
+        log_warning "Node.js not found. Installing Node.js 18+..."
+        install_nodejs
+    else
+        # Check Node.js version
+        NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
+        if [ "$NODE_VERSION" -lt 18 ]; then
+            log_warning "Node.js version 18+ is required. Current version: $(node -v). Upgrading..."
+            install_nodejs
+        else
+            log_success "Node.js $(node -v) found"
+        fi
     fi
-    
-    # Check Node.js version
-    NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
-    if [ "$NODE_VERSION" -lt 18 ]; then
-        log_error "Node.js version 18+ is required. Current version: $(node -v)"
-        exit 1
-    fi
-    
-    log_success "Node.js $(node -v) found"
     
     # Check for Git
     if ! command -v git &> /dev/null; then
-        log_error "Git is required but not installed."
-        exit 1
+        log_info "Installing Git..."
+        if [[ "$OS" == "ubuntu" ]]; then
+            sudo apt-get update && sudo apt-get install -y git
+        elif [[ "$OS" == "macos" ]]; then
+            if command -v brew &> /dev/null; then
+                brew install git
+            else
+                log_error "Git is required. Please install Git manually."
+                exit 1
+            fi
+        fi
     fi
     
     log_success "Git $(git --version | cut -d' ' -f3) found"
     
     # Check for curl
     if ! command -v curl &> /dev/null; then
-        log_error "curl is required but not installed."
-        exit 1
+        log_info "Installing curl..."
+        if [[ "$OS" == "ubuntu" ]]; then
+            sudo apt-get install -y curl
+        elif [[ "$OS" == "macos" ]]; then
+            if command -v brew &> /dev/null; then
+                brew install curl
+            else
+                log_error "curl is required. Please install curl manually."
+                exit 1
+            fi
+        fi
     fi
     
     log_success "Prerequisites check passed"
@@ -116,12 +157,7 @@ main() {
     echo "• Tmux (terminal multiplexer)"
     echo
     
-    read -p "Continue with installation? (y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        log_info "Installation cancelled by user"
-        exit 0
-    fi
+    log_info "Starting automatic installation..."
     
     check_os
     check_prerequisites

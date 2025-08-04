@@ -34,15 +34,8 @@ check_existing_installation() {
     if command -v claude &> /dev/null; then
         CURRENT_VERSION=$(claude --version 2>/dev/null | head -n1 || echo "unknown")
         log_warning "Claude Code is already installed (${CURRENT_VERSION})"
-        read -p "Would you like to update it? (y/N): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-            log_info "Updating Claude Code..."
-            claude update || log_warning "Update failed, continuing with installation"
-        else
-            log_info "Skipping Claude Code installation"
-            return 1
-        fi
+        log_info "Updating Claude Code automatically..."
+        claude update || log_warning "Update failed, continuing with installation"
     fi
     return 0
 }

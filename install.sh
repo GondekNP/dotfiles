@@ -200,6 +200,14 @@ main() {
         exit 1
     fi
     
+    # Setup Claude instructions (mirror copilot instructions if they exist)
+    log_info "Setting up Claude instructions..."
+    if "$DOTFILES_DIR/scripts/setup-claude.sh"; then
+        log_success "Claude instructions setup completed"
+    else
+        log_warning "Claude instructions setup had issues (non-critical)"
+    fi
+    
     echo
     echo "======================================"
     log_success "Installation completed successfully!"

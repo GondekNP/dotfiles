@@ -53,7 +53,7 @@ install_claude_npm() {
     fi
     
     # Install Claude Code globally
-    if npm install -g @anthropic-ai/claude-code; then
+    if npm install -g @anthropic-ai/claude-code --no-optional; then
         log_success "Claude Code installed successfully via npm"
         return 0
     else

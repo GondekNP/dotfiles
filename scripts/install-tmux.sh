@@ -47,14 +47,55 @@ check_tmux_installation() {
     fi
 }
 
-# Install tmux on Ubuntu/Debian
-install_tmux_ubuntu() {
-    log_info "Installing tmux on Ubuntu/Debian..."
-    
-    sudo apt-get update
-    sudo apt-get install -y tmux
-    
-    log_success "Tmux installed successfully"
+# Build tmux from source in user space
+install_tmux_from_source() {
+    log_info "Building tmux from source in user directory..."
+
+    local TMUX_VERSION="3.3a"
+    local BUILD_DIR="$HOME/.local/src"
+    local INSTALL_DIR="$HOME/.local"
+
+    # Create directories
+    mkdir -p "$BUILD_DIR" "$INSTALL_DIR"
+
+    # Check for required build tools
+    if ! command -v gcc &> /dev/null || ! command -v make &> /dev/null; then
+        log_error "Build tools (gcc, make) not found. Cannot build from source."
+        log_info "In most devcontainers, tmux should be pre-installed."
+        return 1
+    fi
+
+    cd "$BUILD_DIR"
+
+    # Download tmux source
+    log_info "Downloading tmux source..."
+    if command -v curl &> /dev/null; then
+        curl -L "https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz" | tar -xz
+    elif command -v wget &> /dev/null; then
+        wget -qO- "https://github.com/tmux/tmux/releases/download/${TMUX_VERSION}/tmux-${TMUX_VERSION}.tar.gz" | tar -xz
+    else
+        log_error "Neither curl nor wget available to download tmux"
+        return 1
+    fi
+
+    cd "tmux-${TMUX_VERSION}"
+
+    # Configure and build
+    log_info "Configuring and building tmux..."
+    ./configure --prefix="$INSTALL_DIR" 2>/dev/null
+    make -j$(nproc) 2>/dev/null
+    make install 2>/dev/null
+
+    # Add to PATH if not already there
+    if ! echo "$PATH" | grep -q "$HOME/.local/bin"; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+
+    # Clean up
+    cd && rm -rf "$BUILD_DIR/tmux-${TMUX_VERSION}"
+
+    log_success "Tmux built and installed to ~/.local/bin"
 }
 
 # Install tmux on macOS
@@ -76,13 +117,18 @@ install_tmux() {
     if check_tmux_installation; then
         return 0
     fi
-    
+
+    # In containers, tmux is usually pre-installed
+    log_warning "Tmux not found. In container environments, it should be pre-installed."
+
     case "$OSTYPE" in
         linux-gnu*)
-            if command -v apt-get &> /dev/null; then
-                install_tmux_ubuntu
+            log_info "Attempting to build tmux from source..."
+            if install_tmux_from_source; then
+                return 0
             else
-                log_error "Unsupported Linux distribution. Please install tmux manually."
+                log_error "Failed to build tmux from source"
+                log_info "Please contact your system administrator to install tmux"
                 return 1
             fi
             ;;

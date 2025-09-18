@@ -29,43 +29,24 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Install bash-completion package
-install_bash_completion() {
-    log_info "Installing bash-completion package..."
-    
-    case "$OSTYPE" in
-        linux-gnu*)
-            if command -v apt-get &> /dev/null; then
-                sudo apt-get update
-                sudo apt-get install -y bash-completion git
-                log_success "bash-completion and git installed via apt"
-            elif command -v yum &> /dev/null; then
-                sudo yum install -y bash-completion git
-                log_success "bash-completion and git installed via yum"
-            elif command -v dnf &> /dev/null; then
-                sudo dnf install -y bash-completion git
-                log_success "bash-completion and git installed via dnf"
-            else
-                log_warning "Package manager not found, trying manual installation"
-                return 1
-            fi
-            ;;
-        darwin*)
-            if command -v brew &> /dev/null; then
-                brew install bash-completion git
-                log_success "bash-completion and git installed via Homebrew"
-            else
-                log_error "Homebrew not found. Please install it first."
-                return 1
-            fi
-            ;;
-        *)
-            log_error "Unsupported operating system: $OSTYPE"
-            return 1
-            ;;
-    esac
-    
-    return 0
+# Check if bash-completion is available
+check_bash_completion() {
+    log_info "Checking for bash-completion..."
+
+    # Check if bash-completion files exist in common locations
+    if [ -f /usr/share/bash-completion/bash_completion ] ||
+       [ -f /etc/bash_completion ] ||
+       [ -f /usr/share/bash-completion/completions/git ]; then
+        log_success "bash-completion is already available"
+        return 0
+    fi
+
+    # In containers, these are usually pre-installed
+    log_warning "bash-completion not found in standard locations"
+    log_info "In container environments, bash-completion is usually pre-installed"
+    log_info "Will proceed with manual git-completion installation"
+
+    return 1
 }
 
 # Download git completion manually if needed
@@ -183,16 +164,16 @@ main() {
     
     log_info "Setting up Git branch and command completion..."
     
-    # Try to install bash-completion package
-    if install_bash_completion; then
-        log_success "Package installation completed"
+    # Check if bash-completion is available (usually pre-installed in containers)
+    if check_bash_completion; then
+        log_success "Using existing bash-completion"
     else
-        log_warning "Package installation failed, trying manual installation"
+        log_warning "bash-completion not found, installing git-completion manually"
         if install_git_completion_manual; then
-            log_success "Manual installation completed"
+            log_success "Manual git-completion installation completed"
         else
-            log_error "Both package and manual installation failed"
-            return 1
+            log_error "Failed to install git-completion"
+            log_info "Git completion is optional - continuing anyway"
         fi
     fi
     

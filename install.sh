@@ -60,25 +60,45 @@ check_os() {
 
 # Install Node.js if needed
 install_nodejs() {
-    log_info "Installing Node.js 18+ using NodeSource repository..."
-    
-    if [[ "$OS" == "ubuntu" ]]; then
-        # Install Node.js 18.x on Ubuntu/Debian
-        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-        sudo apt-get install -y nodejs
-    elif [[ "$OS" == "macos" ]]; then
-        # Install Node.js on macOS using Homebrew
-        if command -v brew &> /dev/null; then
-            brew install node@18
-            brew link node@18
-        else
-            log_error "Homebrew not found. Please install Node.js 18+ manually from https://nodejs.org/"
-            exit 1
-        fi
+    log_info "Installing Node.js 18+ in user space..."
+
+    # Try to install Node.js via nvm (Node Version Manager) for user-space installation
+    if ! command -v nvm &> /dev/null; then
+        log_info "Installing nvm for user-space Node.js management..."
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+        export NVM_DIR="$HOME/.nvm"
+        [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    fi
+
+    # Install Node.js 18 using nvm
+    if command -v nvm &> /dev/null; then
+        nvm install 18
+        nvm use 18
+        nvm alias default 18
+        log_success "Node.js installed via nvm"
     else
-        log_error "Automatic Node.js installation not supported on this OS."
-        log_info "Please install Node.js 18+ manually from https://nodejs.org/"
-        exit 1
+        # Fallback: Download Node.js binary directly
+        log_info "Installing Node.js binary to user directory..."
+        NODE_VERSION="v18.19.0"
+        NODE_ARCH="$(uname -m)"
+        if [[ "$NODE_ARCH" == "x86_64" ]]; then
+            NODE_ARCH="x64"
+        elif [[ "$NODE_ARCH" == "aarch64" ]]; then
+            NODE_ARCH="arm64"
+        fi
+
+        NODE_URL="https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz"
+
+        mkdir -p "$HOME/.local"
+        curl -L "$NODE_URL" | tar -xJ -C "$HOME/.local" --strip-components=1
+
+        # Add to PATH if not already there
+        if ! echo "$PATH" | grep -q "$HOME/.local/bin"; then
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+            export PATH="$HOME/.local/bin:$PATH"
+        fi
+
+        log_success "Node.js installed to ~/.local"
     fi
 }
 
@@ -103,33 +123,30 @@ check_prerequisites() {
     
     # Check for Git
     if ! command -v git &> /dev/null; then
-        log_info "Installing Git..."
-        if [[ "$OS" == "ubuntu" ]]; then
-            sudo apt-get update && sudo apt-get install -y git
-        elif [[ "$OS" == "macos" ]]; then
-            if command -v brew &> /dev/null; then
-                brew install git
-            else
-                log_error "Git is required. Please install Git manually."
-                exit 1
-            fi
-        fi
+        log_error "Git is required but not found."
+        log_info "In container environments, Git should be pre-installed."
+        log_info "Please contact your system administrator or install Git manually."
+        # In most devcontainers, git is pre-installed, so this is likely an edge case
+        exit 1
     fi
     
     log_success "Git $(git --version | cut -d' ' -f3) found"
     
     # Check for curl
     if ! command -v curl &> /dev/null; then
-        log_info "Installing curl..."
-        if [[ "$OS" == "ubuntu" ]]; then
-            sudo apt-get install -y curl
-        elif [[ "$OS" == "macos" ]]; then
-            if command -v brew &> /dev/null; then
-                brew install curl
-            else
-                log_error "curl is required. Please install curl manually."
-                exit 1
-            fi
+        # Try wget as fallback
+        if command -v wget &> /dev/null; then
+            log_warning "curl not found, but wget is available. Using wget as fallback."
+            # Create curl wrapper function
+            curl() {
+                wget -qO- "$@"
+            }
+            export -f curl
+        else
+            log_error "Neither curl nor wget found."
+            log_info "These tools are usually pre-installed in containers."
+            log_info "Please contact your system administrator."
+            exit 1
         fi
     fi
     

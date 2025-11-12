@@ -168,6 +168,7 @@ main() {
     echo
     echo "This will install:"
     echo "• Claude Code (AI coding assistant)"
+    echo "• OpenCode AI (AI coding assistant)"
     echo "• VS Code extensions & configuration (for devcontainer)"
     echo "• GitHub Copilot extensions"
     echo "• Git repository autocomplete (branch completion)"
@@ -189,6 +190,14 @@ main() {
     else
         log_error "Claude Code installation failed"
         exit 1
+    fi
+
+    # Install OpenCode AI
+    log_info "Installing OpenCode AI..."
+    if "$DOTFILES_DIR/scripts/install-opencode.sh"; then
+        log_success "OpenCode AI installation completed"
+    else
+        log_warning "OpenCode AI installation failed (non-critical)"
     fi
     
     # Install VS Code extensions and configuration
@@ -234,8 +243,9 @@ main() {
     echo "1. Restart your terminal or run: source ~/.bashrc"
     echo "2. Open VS Code and sign in to GitHub Copilot"
     echo "3. Run 'claude' in a project directory to start Claude Code"
-    echo "4. Use 'tmux' to start a new terminal session"
-    echo "5. Test Git completion: type 'git switch <TAB><TAB>' to see branches"
+    echo "4. Run 'opencode auth login' to configure OpenCode AI"
+    echo "5. Use 'tmux' to start a new terminal session"
+    echo "6. Test Git completion: type 'git switch <TAB><TAB>' to see branches"
     echo
     echo "For troubleshooting, see: $DOTFILES_DIR/docs/"
 }

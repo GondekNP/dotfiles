@@ -1,0 +1,39 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "nrp": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "NRP AI",
+      "options": {
+        "baseURL": "https://ellm.nrp-nautilus.io/v1",
+        "apiKey": "{env:NRP_API_KEY}"
+      },
+      "models": {
+        "qwen3": {
+          "name": "Qwen 3 (Multimodal)"
+        },
+        "gemma3": {
+          "name": "Gemma 3 (Multimodal)"
+        },
+        "glm-4.5v": {
+          "name": "GLM-4.5V (Multimodal)"
+        },
+        "embed-mistral": {
+          "name": "Embed Mistral (Embedding)"
+        },
+        "gorilla": {
+          "name": "Gorilla (Evaluation)"
+        },
+        "test-gaudi3": {
+          "name": "Test Gaudi3 (Evaluation)"
+        },
+        "olmo": {
+          "name": "OLMo (Evaluation)"
+        },
+        "watt": {
+          "name": "Watt (Evaluation)"
+        }
+      }
+    }
+  }
+}
